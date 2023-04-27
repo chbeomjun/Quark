@@ -1,0 +1,160 @@
+use web_sys::{WebGlRenderingContext as GL, WebGlBuffer, WebGlProgram, WebGlUniformLocation};
+use js_sys::{Float32Array, Uint16Array};
+use wasm_bindgen::JsCast;
+use crate::utils::{compile_shader, link_program};
+
+pub struct Cube {
+    gl: GL,
+    program: WebGlProgram,
+    vertex_buffer: WebGlBuffer,
+    index_buffer: WebGlBuffer,
+}
+
+impl Cube {
+    pub fn new() -> Self {
+        let window = web_sys::window().expect("No global `window` exists.");
+        let document = window.document().expect("No global `document` exists.");
+        let canvas = document.get_element_by_id("canvas").unwrap();
+        let canvas: web_sys::HtmlCanvasElement = canvas
+            .dyn_into::<web_sys::HtmlCanvasElement>()
+            .map_err(|_| ())
+            .unwrap();
+
+        let gl = canvas
+            .get_context("webgl")
+            .unwrap()
+            .unwrap()
+            .dyn_into::<GL>()
+            .unwrap();
+
+        let vert_shader = compile_shader(
+            &gl,
+            GL::VERTEX_SHADER,
+            r#"
+            precision mediump float;
+
+            attribute vec4 a_position;
+            uniform mat4 u_model_view_projection;
+            uniform vec4 u_color;
+
+            varying vec4 v_color;
+
+            void main() {
+                gl_Position = u_model_view_projection * a_position;
+                v_color = u_color;
+            }
+            "#,
+        )
+        .unwrap();
+
+        let frag_shader = compile_shader(
+            &gl,
+            GL::FRAGMENT_SHADER,
+            r#"
+            precision mediump float;
+
+            varying vec4 v_color;
+
+            void main() {
+                gl_FragColor = v_color;
+            }
+            "#,
+        )
+        .unwrap();
+
+        let program = link_program(&gl, &vert_shader, &frag_shader).unwrap();
+
+        let vertices: [f32; 24] = [
+            // x, y, z coordinates for each vertex
+            -1.0, -1.0, 1.0,
+            1.0, -1.0, 1.0,
+            1.0, 1.0, 1.0,
+            -1.0, 1.0, 1.0,
+            -1.0, -1.0, -1.0,
+            1.0, -1.0, -1.0,
+            1.0, 1.0, -1.0,
+            -1.0, 1.0, -1.0
+        ];
+        
+
+        let indices: [u16; 36] = [
+            // Indices for each triangle
+            0, 1, 2,
+            2, 3, 0,
+            4, 5, 6,
+            6, 7, 4,
+            0, 1, 5,
+            5, 4, 0,
+            2, 3, 7,
+            7, 6, 2,
+            0, 3, 7,
+            7, 4, 0,
+            1, 2, 6,
+            6, 5, 1
+        ];
+
+
+        let vertex_buffer = gl.create_buffer().ok_or("failed to create vertex buffer").unwrap();
+        gl.bind_buffer(GL::ARRAY_BUFFER, Some(&vertex_buffer));
+        unsafe {
+            gl.buffer_data_with_array_buffer_view(
+                GL::ARRAY_BUFFER,
+                &js_sys::Float32Array::view(&vertices),
+                GL::STATIC_DRAW,
+            );
+        }
+
+        let index_buffer = gl.create_buffer().ok_or("failed to create index buffer").unwrap();
+        gl.bind_buffer(GL::ELEMENT_ARRAY_BUFFER, Some(&index_buffer));
+        unsafe {
+            gl.buffer_data_with_array_buffer_view(
+                GL::ELEMENT_ARRAY_BUFFER,
+                &js_sys::Uint16Array::view(&indices),
+                GL::STATIC_DRAW,
+            );
+        }
+
+        Self {
+            gl,
+            program,
+            vertex_buffer,
+            index_buffer,
+        }
+    }
+
+    pub fn draw(&self) {
+        let gl = &self.gl;
+        gl.use_program(Some(&self.program));
+
+        gl.bind_buffer(GL::ARRAY_BUFFER, Some(&self.vertex_buffer));
+    gl.bind_buffer(GL::ELEMENT_ARRAY_BUFFER, Some(&self.index_buffer));
+    let a_position = gl.get_attrib_location(&self.program, "a_position") as u32;
+    gl.vertex_attrib_pointer_with_i32(a_position, 3, GL::FLOAT, false, 0, 0);
+    gl.enable_vertex_attrib_array(a_position);
+
+    let u_model_view_projection = gl
+        .get_uniform_location(&self.program, "u_model_view_projection")
+        .unwrap();
+    let model_view_projection_matrix: [f32; 16] = [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    ];
+
+    gl.uniform_matrix4fv_with_f32_array(
+        Some(&u_model_view_projection),
+        false,
+        &model_view_projection_matrix,
+    );
+
+    let u_color = gl.get_uniform_location(&self.program, "u_color").unwrap();
+    let color: [f32; 4] = [
+        1.0, 0.0, 0.0, 1.0 
+    ];
+
+    gl.uniform4f(Some(&u_color), color[0], color[1], color[2], color[3]);
+
+    gl.draw_elements_with_i32(GL::TRIANGLES, 36, GL::UNSIGNED_SHORT, 0);
+    }  
+}

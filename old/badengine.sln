@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "badengine", "badengine.vcxproj", "{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|arm64 = Debug|arm64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|arm64 = Release|arm64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Debug|arm64.ActiveCfg = Debug|arm64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Debug|arm64.Build.0 = Debug|arm64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Debug|x64.ActiveCfg = Debug|x64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Debug|x64.Build.0 = Debug|x64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Debug|x86.ActiveCfg = Debug|Win32
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Debug|x86.Build.0 = Debug|Win32
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Release|arm64.ActiveCfg = Release|arm64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Release|arm64.Build.0 = Release|arm64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Release|x64.ActiveCfg = Release|x64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Release|x64.Build.0 = Release|x64
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Release|x86.ActiveCfg = Release|Win32
+		{7CFBB40D-B2D9-4777-B532-DA2CA350E02B}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4EABB676-890B-4EA4-BE6B-B0E4E70B90CA}
+	EndGlobalSection
+EndGlobal
