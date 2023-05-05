@@ -4,14 +4,13 @@ exports.GameObject = void 0;
 const gl_matrix_1 = require("gl-matrix");
 const mesh_1 = require("./mesh");
 const fbx_loader_1 = require("./fbx_loader");
-class GameObject {
-    position;
-    rotation;
-    scale;
+const abstract_object_1 = require("./abstract_object");
+class GameObject extends abstract_object_1.AbstractObject {
     mesh;
     constructor(mesh) {
+        super();
         this.position = gl_matrix_1.vec3.create();
-        this.rotation = gl_matrix_1.vec3.create();
+        this.rotation = gl_matrix_1.quat.create();
         this.scale = gl_matrix_1.vec3.fromValues(1, 1, 1);
         this.mesh = mesh;
     }

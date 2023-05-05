@@ -10,7 +10,7 @@ export class Engine {
   public gameObjects: GameObject[] = [];
   public gl: WebGLRenderingContext;
   public defaultShaderProgram: WebGLProgram;
-  public MAX_LIGHTS: Number = 1000;
+  public MAX_LIGHTS: Number = 100;
   // Add a new property to store the lights
   public lights: Light[] = [];
 
@@ -56,12 +56,25 @@ export class Engine {
     if (!gl) {
       throw new Error('Unable to create WebGL context.');
     }
+
     gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+
+    // Query the maximum number of uniform vectors allowed in the fragment shader
+    // Pretty sure this depends on system? Not sure about in webgl, but GLES is this way.
+    const maxUniformVectors = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+    console.log('Max Fragment Uniform Vectors:', maxUniformVectors);
+
+    // automatically set MAX_LIGHTS
+    const lightUniformVectors = 3; 
+    const otherUniformVectors = 5;
+    this.MAX_LIGHTS = Math.floor((maxUniformVectors - otherUniformVectors) / lightUniformVectors);
+
     return gl;
-  }
+}
+
 
   private createDefaultShaderProgram(): WebGLProgram {
-    // Add your default vertex and fragment shader code here
     const vertexShaderCode = `
       attribute vec4 a_position;
       attribute vec3 a_normal;
@@ -80,31 +93,36 @@ export class Engine {
 
     const fragmentShaderCode = `
       precision mediump float;
-
+    
       varying vec3 v_normal;
-
+    
       struct Light {
         vec3 color;
         float intensity;
+        vec3 direction;
       };
-
+    
       uniform Light u_lights[${this.MAX_LIGHTS}]; // Set a maximum number of lights
       uniform int u_lightCount;
-
+    
       void main() {
         vec3 normal = normalize(v_normal);
         vec3 baseColor = vec3(1.0, 0.0, 0.0); // Base color (red)
         vec3 finalColor = vec3(0.0, 0.0, 0.0);
-
-        for (int i = 0; i < u_lightCount; ++i) {
+    
+        for (int i = 0; i < ${this.MAX_LIGHTS}; ++i) { // Use the constant value as the loop limit
+          if (i >= u_lightCount) { // Break out of the loop when the index reaches the actual light count
+            break;
+          }
+    
           float lightIntensity = max(dot(normal, u_lights[i].direction), 0.2); // Calculate light intensity with a minimum ambient value
           finalColor += u_lights[i].color * lightIntensity * u_lights[i].intensity;
         }
-
+    
         gl_FragColor = vec4(baseColor * finalColor, 1.0);
       }
     `;
-
+  
 
     const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderCode);
     const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderCode);
@@ -168,14 +186,17 @@ export class Engine {
   }
 
   public update(): void {
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0)
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     for (const gameObject of this.gameObjects) {
-        gameObject.update();
-        this.render(gameObject);
-      }
-      
-      }
+      gameObject.update();
+      this.render(gameObject);
+    }
+  
+    // Log the lights array
+    console.log(this.lights);
+  }
+  
     
   public setViewport(width: number, height: number): void {
     this.gl.canvas.width = width;

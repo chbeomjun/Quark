@@ -1,18 +1,17 @@
-import { vec3 } from 'gl-matrix';
+import { quat, vec3 } from 'gl-matrix';
 import { Mesh } from './mesh';
 import { Engine } from './engine';
 import { loadFbx } from './fbx_loader';
+import { AbstractObject } from './abstract_object';
 
-export class GameObject {
-  public position: vec3;
-  public rotation: vec3;
-  public scale: vec3;
+
+export class GameObject extends AbstractObject {
   public mesh: Mesh;
 
-  private constructor(mesh: Mesh) {
-    
+  protected constructor(mesh: Mesh) {
+    super();
     this.position = vec3.create();
-    this.rotation = vec3.create();
+    this.rotation = quat.create();
     this.scale = vec3.fromValues(1, 1, 1);
     this.mesh = mesh;
   }
