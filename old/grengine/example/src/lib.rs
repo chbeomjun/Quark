@@ -1,9 +1,0 @@
-pub mod assets;
-pub mod fbx_loader;
-pub mod game_engine;
-pub mod game_object;
-pub mod input;
-pub mod model;
-pub mod primitives;
-pub mod renderer;
-pub mod utils;
