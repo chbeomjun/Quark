@@ -1,7 +1,7 @@
 # Quark
 Simple Typescript-based game engine designed to work seamlessly with React.
 
-![image](https://github.com/liemeldert/badengine/assets/45272685/c3bb777b-4907-484d-918e-469bdf58a5f8)
+![image](https://lh7-us.googleusercontent.com/oyhTe-TO045ILo-oNXHEMDxYKVbqyPrWUMdBYru-3zNSxLhEBNoJ4EwYx98QYa5J1KBYUASRDtaPJuqN9x9w0AHjBa9J66ZsX2Fu4SQeKXimRJPOOUMUvlAGsFlWblZU_UzCu-pbMyD9deQLhBnSA3E)
 
 
 ### Simple cube component example:
