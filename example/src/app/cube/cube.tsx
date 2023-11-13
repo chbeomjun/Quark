@@ -6,14 +6,44 @@ import { ModelType } from 'grengine/dist/loader/mesh_loader';
 const ThreeDScene = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const camera = new Camera(90, window.innerWidth / window.innerHeight, 1, 1000);
+  camera.position[2] = -10;
+  var use_mouse = false;
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    const step = 10;
+    switch (e.code) {
+      case 'ArrowUp':
+        camera.position[1] += step;
+        break;
+      case 'ArrowDown':
+        camera.position[1] -= step;
+        break;
+      case 'ArrowLeft':
+        camera.position[0] -= step;
+        break;
+      case 'ArrowRight':
+        camera.position[0] += step;
+        break;
+      case 'Escape':
+        use_mouse = !use_mouse;
+        break;
+      default:
+        break;
+    }
+  }, [camera.position, canvasRef]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const sensitivity = 0.001;
+    camera.rotation[0] += e.movementY * sensitivity;
+    camera.rotation[1] += e.movementX * sensitivity;
+  }, [camera.rotation]);
+
+
   const initScene = useCallback(async (canvas: HTMLCanvasElement | null) => {
     if (!canvas) {
       return;
     }
-
-    const camera = new Camera(90, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position[2] = -10;
-    // camera.rotation[0] = Math.PI;
     
     const engine = Engine.init(canvas, camera); 
 
@@ -180,7 +210,15 @@ const ThreeDScene = () => {
           gameObject.rotation[0] += 0.01;
           gameObject.rotation[1] += 0.01;
       }
-      camera.rotation[1] += 0.01;
+      if (use_mouse && canvasRef.current) {
+        canvasRef.current.requestPointerLock();
+        console.log("locking");
+      } else {
+        document.exitPointerLock();
+        console.log("unlocking");
+      }
+
+      // camera.rotation[1] += 0.01;
       engine.update();
       requestAnimationFrame(gameLoop);
       
@@ -188,10 +226,17 @@ const ThreeDScene = () => {
 
     gameLoop();
   }, []);
+  
 
   useEffect(() => {
     if (canvasRef.current) {
       initScene(canvasRef.current);
+
+      // Keyboard controls
+      window.addEventListener('keydown', handleKeyDown);
+
+      // Mouse controls
+      canvasRef.current.addEventListener('mousemove', handleMouseMove);
     }
   }, [canvasRef, initScene]);
  

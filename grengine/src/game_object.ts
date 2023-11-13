@@ -15,6 +15,48 @@ export class GameObject extends AbstractObject {
     this.mesh = mesh;
   }
 
+  public createShaderProgram(vertexShaderCode: string, fragmentShaderCode: string): WebGLProgram {
+    const gl = this.gl;
+
+    const createShader = (type: GLenum, source: string): WebGLShader => {
+      const shader = gl.createShader(type);
+      if (!shader) {
+        throw new Error('Unable to create a shader.');
+      }
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const error = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('Failed to compile the shader: ' + error);
+      }
+
+      return shader;
+    };
+
+    const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderCode);
+    const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderCode);
+
+    const shaderProgram = gl.createProgram();
+    if (!shaderProgram) {
+      throw new Error('Unable to create the shader program.');
+    }
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      const error = gl.getProgramInfoLog(shaderProgram);
+      throw new Error('Failed to link the shader program: ' + error);
+    }
+
+    this.mesh.shaderProgram = shaderProgram;
+    return shaderProgram;
+  }
+
+
+
   public static async create(options: {
     modelData: string | ArrayBuffer | { vertices: number[]; normals: number[] };
     modelType: ModelType;

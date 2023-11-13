@@ -13,6 +13,7 @@ export class Engine {
   public MAX_LIGHTS: Number = 100;
   // Add a new property to store the lights
   public lights: Light[] = [];
+  public defaultShaderProgram: WebGLProgram;
 
   // Add a new method to create and register a light
   public createLight<T extends Light>(light: T): T {
@@ -206,7 +207,6 @@ export class Engine {
         gl.uniform3fv(lightDirectionUniformLocation, vec3.fromValues(0, 0, 0)); // No direction for area lights
       }
     }
-
     // Draw the object
     gl.drawArrays(gl.TRIANGLES, 0, mesh.vertices.length / 3);
     
