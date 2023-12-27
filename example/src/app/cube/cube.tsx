@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Engine, Camera, Mesh, Light, DirectionalLight, AreaLight, GameObject } from 'grengine';
 import { vec2, vec3 } from 'gl-matrix';
-import { ModelType } from 'grengine/dist/loader/mesh_loader';
+import { ModelType } from 'quark/dist/loader/mesh_loader';
 
 const ThreeDScene = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const use_mouse = useRef(false);
 
   const camera = new Camera(90, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position[2] = -10;
-  var use_mouse = false;
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLCanvasElement>) => {
     const step = 10;
@@ -26,7 +26,7 @@ const ThreeDScene = () => {
         camera.position[0] += step;
         break;
       case 'Escape':
-        use_mouse = !use_mouse;
+        use_mouse.current = !use_mouse.current;
         break;
       default:
         break;
@@ -55,15 +55,6 @@ const ThreeDScene = () => {
     light.position[2] = 10;
     light.rotation[0] = Math.PI / 2;    
     engine.createLight(light);
-
-    // const areaLight = new AreaLight(
-    //   vec3.fromValues(1, 1, 1), // color
-    //   1.0, // intensity
-    //   vec3.fromValues(0, 5, 0), // position
-    //   vec2.fromValues(10, 10) // size
-    // );
-    // engine.createLight(areaLight);  
-    
 
     window.addEventListener('resize', () => {
       engine.setViewport(window.innerWidth, window.innerHeight);

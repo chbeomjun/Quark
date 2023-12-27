@@ -189,3 +189,8 @@ const ThreeDScene = () => {
 
 export default ThreeDScene;
 ```
+
+### What is .qrkmez?
+
+A .qrkmez or **Q**ua**rk** **mez**anine file is a file containing only the verticies and normals of a 3d model.
+We use this format, which is simply a text file, to simplify loading 3d models.

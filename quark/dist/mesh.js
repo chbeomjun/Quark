@@ -4,10 +4,12 @@ exports.Mesh = void 0;
 class Mesh {
     vertices;
     normals;
+    colors;
     shaderProgram;
-    constructor(vertices, normals, shaderProgram = null) {
+    constructor(vertices, normals, colors, shaderProgram = null) {
         this.vertices = vertices;
         this.normals = normals;
+        this.colors = colors;
         this.shaderProgram = shaderProgram;
     }
 }

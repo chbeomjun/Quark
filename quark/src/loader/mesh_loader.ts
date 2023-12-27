@@ -36,7 +36,7 @@ export async function loadMesh(
 
     case ModelType.Vertex:
       if (typeof modelData === 'object' && 'vertices' in modelData && 'normals' in modelData) {
-        mesh = new Mesh(modelData.vertices, modelData.normals, shaderProgram);
+        mesh = mesh = new Mesh(modelData.vertices, modelData.normals, [], shaderProgram);
       } else {
         throw new Error('Invalid data type for Vertex model. Expected an object with vertices and normals.');
       }

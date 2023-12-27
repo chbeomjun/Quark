@@ -8,16 +8,12 @@ class Engine {
     static instance;
     cameras = [];
     gameObjects = [];
-    defaultShaderProgram;
     MAX_LIGHTS = 100;
-    // Add a new property to store the lights
     lights = [];
-    // Add a new method to create and register a light
     createLight(light) {
         this.lights.push(light);
         return light;
     }
-    // Add a new method to remove a light
     removeLight(light) {
         const index = this.lights.indexOf(light);
         if (index !== -1) {
@@ -25,11 +21,10 @@ class Engine {
         }
     }
     constructor() {
-        this.defaultShaderProgram = this.createDefaultShaderProgram();
     }
     static init() {
         if (!Engine.instance) {
-            Engine.instance = new Engine(); // Remove the camera and canvas parameters
+            Engine.instance = new Engine();
         }
         return Engine.instance;
     }
@@ -67,11 +62,6 @@ class Engine {
         return gl;
     }
     async createGameObject(options) {
-        // Assign the defaultShaderProgram if options.shaderProgram is not provided
-        options.shaderProgram = options.shaderProgram || this.defaultShaderProgram;
-        if (options.shaderProgram === undefined || options.shaderProgram === null) {
-            options.shaderProgram = this.defaultShaderProgram;
-        }
         const gameObject = await game_object_1.GameObject.create(options);
         this.gameObjects.push(gameObject);
         return gameObject;
@@ -97,6 +87,12 @@ class Engine {
     render(gameObject, camera) {
         const mesh = gameObject.mesh;
         const gl = camera.gl;
+        // Set up the shader program
+        const shaderProgram = mesh.shaderProgram || camera.defaultShaderProgram;
+        if (!shaderProgram) {
+            console.error("Error: No shader program available for rendering.");
+            return;
+        }
         // Create and bind the vertex buffer
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -105,19 +101,21 @@ class Engine {
         const normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.normals), gl.STATIC_DRAW);
-        // Set up the shader program
-        gl.useProgram(mesh.shaderProgram);
-        if (!mesh.shaderProgram) {
-            console.error("Error: Shader program is null.");
-            return;
-        }
+        const colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.colors), gl.STATIC_DRAW);
+        const colorAttribute = gl.getAttribLocation(shaderProgram, 'a_color');
+        gl.enableVertexAttribArray(colorAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.vertexAttribPointer(colorAttribute, 4, gl.FLOAT, false, 0, 0);
+        gl.useProgram(shaderProgram);
         // Set up the position attribute
-        const positionAttribute = gl.getAttribLocation(mesh.shaderProgram, 'a_position');
+        const positionAttribute = gl.getAttribLocation(shaderProgram, 'a_position');
         gl.enableVertexAttribArray(positionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.vertexAttribPointer(positionAttribute, 3, gl.FLOAT, false, 0, 0);
         // Set up the normal attribute
-        const normalAttribute = gl.getAttribLocation(mesh.shaderProgram, 'a_normal');
+        const normalAttribute = gl.getAttribLocation(shaderProgram, 'a_normal');
         gl.enableVertexAttribArray(normalAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         gl.vertexAttribPointer(normalAttribute, 3, gl.FLOAT, false, 0, 0);

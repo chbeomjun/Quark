@@ -9,8 +9,10 @@ export declare class Camera {
     far: number;
     gl: WebGLRenderingContext;
     shaderProgram: WebGLProgram | null;
-    constructor(fov: number, aspectRatio: number, near: number, far: number, canvas: HTMLCanvasElement);
-    createShaderProgram(vertexShaderCode: string, fragmentShaderCode: string): WebGLProgram;
+    defaultShaderProgram: WebGLProgram | null;
+    constructor(fov: number, aspectRatio: number, near: number, far: number, canvas: HTMLCanvasElement, defaultShaderProgram?: WebGLProgram);
+    private createShader;
+    private createProgram;
     private createWebGLContext;
     setViewport(width: number, height: number): void;
     getViewMatrix(): mat4;

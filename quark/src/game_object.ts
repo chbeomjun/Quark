@@ -74,7 +74,7 @@ export class GameObject extends AbstractObject {
   }  
 
   public update(): void {
-    // This method can be overridden in derived classes to update the GameObject.
+    // This method can be overridden in derived classes, called onframe when a gameobject is not culled.
   }
 
   public setUniformScale(scale: number): void {

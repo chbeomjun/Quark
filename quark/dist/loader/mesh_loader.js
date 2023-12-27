@@ -30,7 +30,7 @@ async function loadMesh(modelData, modelType, shaderProgram) {
         //   break;
         case ModelType.Vertex:
             if (typeof modelData === 'object' && 'vertices' in modelData && 'normals' in modelData) {
-                mesh = new mesh_1.Mesh(modelData.vertices, modelData.normals, shaderProgram);
+                mesh = mesh = new mesh_1.Mesh(modelData.vertices, modelData.normals, [], shaderProgram);
             }
             else {
                 throw new Error('Invalid data type for Vertex model. Expected an object with vertices and normals.');

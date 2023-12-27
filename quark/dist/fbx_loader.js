@@ -7,7 +7,7 @@ function loadObj(objText) {
         try {
             const vertices = extractVertices(objText);
             const normals = extractNormals(objText);
-            resolve(new mesh_1.Mesh(vertices, normals));
+            resolve(new mesh_1.Mesh(vertices, normals, []));
         }
         catch (error) {
             reject(error);
@@ -42,4 +42,18 @@ function extractNormals(objText) {
         throw new Error("Invalid OBJ data: Normals are missing.");
     }
     return normals;
+}
+function extractColors(objText) {
+    const lines = objText.split('\n');
+    const colors = [];
+    lines.forEach((line) => {
+        if (line.startsWith('vc ')) { // Assuming 'vc' is the prefix for vertex colors
+            const parts = line.split(' ').map((part) => parseFloat(part));
+            colors.push(parts[1], parts[2], parts[3]); // RGB values
+        }
+    });
+    if (colors.length === 0) {
+        throw new Error("Invalid OBJ data: Vertex colors are missing.");
+    }
+    return colors;
 }

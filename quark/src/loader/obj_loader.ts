@@ -5,7 +5,7 @@ export function loadObj(objText: string): Promise<Mesh> {
     try {
       const vertices = extractVertices(objText);
       const normals = extractNormals(objText);
-      resolve(new Mesh(vertices, normals));
+      resolve(new Mesh(vertices, normals, []));
     } catch (error) {
       reject(error);
     }

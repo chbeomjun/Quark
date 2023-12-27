@@ -1,26 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Camera = void 0;
+exports.GameObject = void 0;
 const gl_matrix_1 = require("gl-matrix");
-class Camera {
-    position;
-    rotation;
-    scale;
-    fov;
-    aspectRatio;
-    near;
-    far;
-    gl;
-    shaderProgram = null;
-    constructor(fov, aspectRatio, near, far, canvas) {
+const abstract_object_1 = require("./abstract_object");
+const mesh_loader_1 = require("./loader/mesh_loader");
+class GameObject extends abstract_object_1.AbstractObject {
+    mesh;
+    constructor(mesh) {
+        super();
         this.position = gl_matrix_1.vec3.create();
-        this.rotation = gl_matrix_1.vec3.create();
+        this.rotation = gl_matrix_1.quat.create();
         this.scale = gl_matrix_1.vec3.fromValues(1, 1, 1);
-        this.fov = fov;
-        this.aspectRatio = aspectRatio;
-        this.near = near;
-        this.far = far;
-        this.gl = this.createWebGLContext(canvas);
+        this.mesh = mesh;
     }
     createShaderProgram(vertexShaderCode, fragmentShaderCode) {
         const gl = this.gl;
@@ -51,36 +42,24 @@ class Camera {
             const error = gl.getProgramInfoLog(shaderProgram);
             throw new Error('Failed to link the shader program: ' + error);
         }
-        this.shaderProgram = shaderProgram;
+        this.mesh.shaderProgram = shaderProgram;
         return shaderProgram;
     }
-    createWebGLContext(canvas) {
-        const gl = canvas.getContext('webgl');
-        if (!gl) {
-            throw new Error('Unable to create WebGL context.');
+    static async create(options) {
+        let mesh;
+        if (options.modelData && options.modelType !== undefined) {
+            mesh = await (0, mesh_loader_1.loadMesh)(options.modelData, options.modelType, options.shaderProgram);
         }
-        gl.enable(gl.DEPTH_TEST);
-        gl.enable(gl.CULL_FACE);
-        return gl;
+        else {
+            throw new Error('GameObject must be initialized with model data and model type.');
+        }
+        return new GameObject(mesh);
     }
-    setViewport(width, height) {
-        this.gl.canvas.width = width;
-        this.gl.canvas.height = height;
-        this.gl.viewport(0, 0, width, height);
-        this.aspectRatio = width / height;
+    update() {
+        // This method can be overridden in derived classes, called onframe when a gameobject is not culled.
     }
-    getViewMatrix() {
-        const viewMatrix = gl_matrix_1.mat4.create();
-        gl_matrix_1.mat4.rotateX(viewMatrix, viewMatrix, this.rotation[0]);
-        gl_matrix_1.mat4.rotateY(viewMatrix, viewMatrix, this.rotation[1]);
-        gl_matrix_1.mat4.rotateZ(viewMatrix, viewMatrix, this.rotation[2]);
-        gl_matrix_1.mat4.translate(viewMatrix, viewMatrix, gl_matrix_1.vec3.negate(gl_matrix_1.vec3.create(), this.position));
-        return viewMatrix;
-    }
-    getProjectionMatrix() {
-        const projectionMatrix = gl_matrix_1.mat4.create();
-        gl_matrix_1.mat4.perspective(projectionMatrix, this.fov, this.aspectRatio, this.near, this.far);
-        return projectionMatrix;
+    setUniformScale(scale) {
+        this.scale = gl_matrix_1.vec3.fromValues(scale, scale, scale);
     }
 }
-exports.Camera = Camera;
+exports.GameObject = GameObject;

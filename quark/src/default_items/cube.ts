@@ -102,10 +102,10 @@ class CubeGameObject extends GameObject {
       -1,  0,  0
     ];
   
-    constructor(engine: Engine) {
-      super(engine, {
-        modelData: { vertices: this.vertices, normals: this.normals },
-        modelType: ModelType.Vertex,
+    constructor() {
+      super({
+          modelData: { vertices: this.vertices, normals: this.normals },
+          modelType: ModelType.Vertex,
       });
   
       this.position[2] = 10;

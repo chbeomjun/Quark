@@ -7,7 +7,7 @@ function loadObj(objText) {
         try {
             const vertices = extractVertices(objText);
             const normals = extractNormals(objText);
-            resolve(new mesh_1.Mesh(vertices, normals));
+            resolve(new mesh_1.Mesh(vertices, normals, []));
         }
         catch (error) {
             reject(error);

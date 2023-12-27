@@ -6,7 +6,6 @@ export declare class Engine {
     private static instance;
     cameras: Camera[];
     gameObjects: GameObject[];
-    defaultShaderProgram: WebGLProgram;
     MAX_LIGHTS: Number;
     lights: Light[];
     createLight<T extends Light>(light: T): T;

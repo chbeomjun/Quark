@@ -5,7 +5,7 @@ export function loadObj(objText: string): Promise<Mesh> {
     try {
       const vertices = extractVertices(objText);
       const normals = extractNormals(objText);
-      resolve(new Mesh(vertices, normals));
+      resolve(new Mesh(vertices, normals, []));
     } catch (error) {
       reject(error);
     }
@@ -46,4 +46,22 @@ function extractNormals(objText: string): number[] {
   }
 
   return normals;
+}
+
+function extractColors(objText: string): number[] {
+  const lines = objText.split('\n');
+  const colors: number[] = [];
+
+  lines.forEach((line) => {
+    if (line.startsWith('vc ')) { // Assuming 'vc' is the prefix for vertex colors
+      const parts = line.split(' ').map((part) => parseFloat(part));
+      colors.push(parts[1], parts[2], parts[3]); // RGB values
+    }
+  });
+
+  if (colors.length === 0) {
+    throw new Error("Invalid OBJ data: Vertex colors are missing.");
+  }
+
+  return colors;
 }
